@@ -10,7 +10,7 @@ class OpenAIService extends AIModel {
   final HttpClient _httpClient;
   final String apiKey;
 
-  static const String _model = 'gpt-4o-mini';
+  static const String _model = 'gpt-5-mini';
   static const String _systemPrompt = '''
 You are an Interview Assistant.
 
@@ -71,7 +71,6 @@ If a section is not relevant, omit it.
             {'role': 'system', 'content': _systemPrompt},
             {'role': 'user', 'content': prompt},
           ],
-          'temperature': 0.7,
           'response_format': {'type': 'json_object'},
         },
       );

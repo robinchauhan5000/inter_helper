@@ -35,7 +35,6 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
     _initializeService();
     _speechService = SpeechService();
     _checkPermissionsAndInitializeSpeech();
-    _askDemoQuestion();
   }
 
   Future<void> _checkPermissionsAndInitializeSpeech() async {
@@ -112,11 +111,6 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
     _inputController.dispose();
     _speechService.dispose();
     super.dispose();
-  }
-
-  Future<void> _askDemoQuestion() async {
-    const demoQuestion = 'What is goroutine in golang?';
-    await _sendMessage(demoQuestion);
   }
 
   void _switchProvider(AIProvider provider) {
@@ -211,7 +205,7 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
     }
   }
 
-  /// Toggle input microphone (fills text field)
+  /// Toggle input microphone (appends to text field)
   Future<void> _toggleInputMic() async {
     if (_isInputMicListening) {
       // Stop listening
@@ -219,18 +213,28 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
       setState(() => _isInputMicListening = false);
     } else {
       // Start listening
+      final currentText = _inputController.text;
       setState(() => _isInputMicListening = true);
       await _speechService.startListening(
         onResult: (text) {
           setState(() {
             _isInputMicListening = false;
-            _inputController.text = text;
+            // Append new text to existing text with a space
+            if (currentText.isNotEmpty) {
+              _inputController.text = '$currentText $text';
+            } else {
+              _inputController.text = text;
+            }
           });
         },
         onPartialResult: (text) {
-          // Update text field with partial results
+          // Update text field with partial results (appended)
           setState(() {
-            _inputController.text = text;
+            if (currentText.isNotEmpty) {
+              _inputController.text = '$currentText $text';
+            } else {
+              _inputController.text = text;
+            }
           });
         },
       );
@@ -314,6 +318,11 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
               placeholder: 'Ask for a hint, custom response, or pivot...',
               isMicListening: _isInputMicListening,
               onMicPressed: _toggleInputMic,
+              onClearPressed: () {
+                setState(() {
+                  _inputController.clear();
+                });
+              },
               onSendPressed: () {
                 final text = _inputController.text;
                 _sendMessage(text);

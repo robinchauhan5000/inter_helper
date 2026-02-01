@@ -19,13 +19,13 @@ class MainFlutterWindow: NSWindow {
     self.styleMask.insert(.fullSizeContentView)
     
     // Add visual effect view (frosted glass)
-    let visualEffectView = NSVisualEffectView(frame: self.contentView!.bounds)
-    visualEffectView.autoresizingMask = [.width, .height]
-    visualEffectView.material = .hudWindow
-    visualEffectView.state = .active
-    visualEffectView.blendingMode = .behindWindow
+    // let visualEffectView = NSVisualEffectView(frame: self.contentView!.bounds)
+    // visualEffectView.autoresizingMask = [.width, .height]
+    // visualEffectView.material = .hudWindow
+    // visualEffectView.state = .active
+    // visualEffectView.blendingMode = .behindWindow
     
-    self.contentView?.addSubview(visualEffectView, positioned: .below, relativeTo: nil)
+    // self.contentView?.addSubview(visualEffectView, positioned: .below, relativeTo: nil)
 
     let channel = FlutterMethodChannel(
       name: "interx/screen_capture",

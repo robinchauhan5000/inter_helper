@@ -8,6 +8,7 @@ class InterviewCopilotInputBar extends StatelessWidget {
     super.key,
     this.controller,
     this.onMicPressed,
+    this.onClearPressed,
     this.onSendPressed,
     this.onAttachmentPressed,
     this.placeholder = 'Ask for a hint, custom response, or pivot...',
@@ -16,10 +17,17 @@ class InterviewCopilotInputBar extends StatelessWidget {
 
   final TextEditingController? controller;
   final VoidCallback? onMicPressed;
+  final VoidCallback? onClearPressed;
   final VoidCallback? onSendPressed;
   final VoidCallback? onAttachmentPressed;
   final String placeholder;
   final bool isMicListening;
+
+  void _handleSubmit() {
+    if (onSendPressed != null && controller?.text.trim().isNotEmpty == true) {
+      onSendPressed!();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +52,18 @@ class InterviewCopilotInputBar extends StatelessWidget {
               onPressed: onMicPressed,
               isListening: isMicListening,
             ),
+            const SizedBox(width: 12),
+            _IconButton(
+              icon: Icons.clear_rounded,
+              onPressed: onClearPressed,
+              tooltip: 'Clear text',
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Container(
+                constraints: const BoxConstraints(
+                  maxHeight: 200, // Maximum height before scrolling
+                ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 4,
@@ -60,6 +77,7 @@ class InterviewCopilotInputBar extends StatelessWidget {
                   ),
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.add_circle_outline_rounded,
@@ -70,6 +88,11 @@ class InterviewCopilotInputBar extends StatelessWidget {
                     Expanded(
                       child: TextField(
                         controller: controller,
+                        maxLines: null,
+                        minLines: 1,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: (_) => _handleSubmit(),
                         style: const TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 14,
@@ -155,15 +178,21 @@ class _VoiceButton extends StatelessWidget {
 }
 
 class _IconButton extends StatelessWidget {
-  const _IconButton({required this.icon, this.onPressed, this.backgroundColor});
+  const _IconButton({
+    required this.icon,
+    this.onPressed,
+    this.backgroundColor,
+    this.tooltip,
+  });
 
   final IconData icon;
   final VoidCallback? onPressed;
   final Color? backgroundColor;
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    final button = Material(
       color: backgroundColor ?? AppColors.backgroundTertiary.withOpacity(0.4),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
@@ -176,5 +205,10 @@ class _IconButton extends StatelessWidget {
         ),
       ),
     );
+
+    if (tooltip != null) {
+      return Tooltip(message: tooltip!, child: button);
+    }
+    return button;
   }
 }
