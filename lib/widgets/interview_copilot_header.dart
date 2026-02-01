@@ -1,0 +1,178 @@
+import 'package:flutter/material.dart';
+
+import '../theme/app_colors.dart';
+
+/// Header bar for Interview Copilot with logo, title, status, and control buttons.
+class InterviewCopilotHeader extends StatelessWidget {
+  const InterviewCopilotHeader({
+    super.key,
+    this.isMicListening = true,
+    this.isSystemListening = true,
+    this.onMicPressed,
+    this.onSystemPressed,
+    this.onAnalysePressed,
+    this.onClearPressed,
+  });
+
+  final bool isMicListening;
+  final bool isSystemListening;
+  final VoidCallback? onMicPressed;
+  final VoidCallback? onSystemPressed;
+  final VoidCallback? onAnalysePressed;
+  final VoidCallback? onClearPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      decoration: const BoxDecoration(
+        color: AppColors.backgroundSecondary,
+        border: Border(
+          bottom: BorderSide(color: AppColors.backgroundTertiary, width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          _buildLogoAndTitle(),
+          const Spacer(),
+          _buildControlButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogoAndTitle() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: AppColors.accentPurple,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.smart_toy_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'INTERVIEW COPILOT',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: AppColors.statusActive,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'ACTIVE',
+                  style: TextStyle(
+                    color: AppColors.statusActive.withValues(alpha: 0.9),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildControlButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _HeaderButton(
+          icon: Icons.mic_rounded,
+          isActive: isMicListening,
+          onPressed: onMicPressed,
+        ),
+        const SizedBox(width: 6),
+        _HeaderButton(
+          icon: Icons.volume_up_rounded,
+          isActive: isSystemListening,
+          onPressed: onSystemPressed,
+        ),
+        const SizedBox(width: 6),
+        _HeaderButton(icon: Icons.monitor_rounded, onPressed: onAnalysePressed),
+        const SizedBox(width: 6),
+        _HeaderButton(
+          icon: Icons.delete_outline_rounded,
+          onPressed: onClearPressed,
+        ),
+      ],
+    );
+  }
+}
+
+class _HeaderButton extends StatelessWidget {
+  const _HeaderButton({
+    this.label,
+    required this.icon,
+    this.isActive = false,
+    this.onPressed,
+  });
+
+  final String? label;
+  final IconData icon;
+  final bool isActive;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: label ?? '',
+      child: Material(
+        color: AppColors.backgroundTertiary,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(10),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 18, color: AppColors.textPrimary),
+                if (isActive) ...[
+                  const SizedBox(width: 4),
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: AppColors.statusActive,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
