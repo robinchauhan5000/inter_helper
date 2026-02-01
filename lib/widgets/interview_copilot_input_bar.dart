@@ -8,7 +8,6 @@ class InterviewCopilotInputBar extends StatelessWidget {
     super.key,
     this.controller,
     this.onMicPressed,
-    this.onSpeakerPressed,
     this.onSendPressed,
     this.onAttachmentPressed,
     this.placeholder = 'Ask for a hint, custom response, or pivot...',
@@ -17,7 +16,6 @@ class InterviewCopilotInputBar extends StatelessWidget {
 
   final TextEditingController? controller;
   final VoidCallback? onMicPressed;
-  final VoidCallback? onSpeakerPressed;
   final VoidCallback? onSendPressed;
   final VoidCallback? onAttachmentPressed;
   final String placeholder;
@@ -42,11 +40,6 @@ class InterviewCopilotInputBar extends StatelessWidget {
               icon: Icons.mic_rounded,
               onPressed: onMicPressed,
               isListening: isMicListening,
-            ),
-            const SizedBox(width: 12),
-            _VoiceButton(
-              icon: Icons.volume_up_rounded,
-              onPressed: onSpeakerPressed,
             ),
             const SizedBox(width: 16),
             Expanded(

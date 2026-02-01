@@ -7,18 +7,14 @@ class InterviewCopilotHeader extends StatelessWidget {
   const InterviewCopilotHeader({
     super.key,
     this.isMicListening = true,
-    this.isSystemListening = true,
     this.onMicPressed,
-    this.onSystemPressed,
     this.onAnalysePressed,
     this.onClearPressed,
     this.onCopyAllPressed,
   });
 
   final bool isMicListening;
-  final bool isSystemListening;
   final VoidCallback? onMicPressed;
-  final VoidCallback? onSystemPressed;
   final VoidCallback? onAnalysePressed;
   final VoidCallback? onClearPressed;
   final VoidCallback? onCopyAllPressed;
@@ -118,13 +114,6 @@ class InterviewCopilotHeader extends StatelessWidget {
           label: 'Microphone',
           isActive: isMicListening,
           onPressed: onMicPressed,
-        ),
-        const SizedBox(width: 6),
-        _HeaderButton(
-          icon: Icons.volume_up_rounded,
-          label: 'System Audio',
-          isActive: isSystemListening,
-          onPressed: onSystemPressed,
         ),
         const SizedBox(width: 6),
         _HeaderButton(

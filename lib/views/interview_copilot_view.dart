@@ -268,9 +268,7 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
           children: [
             InterviewCopilotHeader(
               isMicListening: _isHeaderMicListening,
-              isSystemListening: true,
               onMicPressed: _toggleHeaderMic,
-              onSystemPressed: () {},
               onAnalysePressed: () {},
               onClearPressed: () {
                 setState(() {
@@ -309,7 +307,6 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
               placeholder: 'Ask for a hint, custom response, or pivot...',
               isMicListening: _isInputMicListening,
               onMicPressed: _toggleInputMic,
-              onSpeakerPressed: () {},
               onSendPressed: () {
                 final text = _inputController.text;
                 _sendMessage(text);
