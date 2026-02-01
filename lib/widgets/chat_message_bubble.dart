@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/app_colors.dart';
+import 'markdown_message.dart';
 
 /// Chat message bubble for user or assistant.
 enum ChatMessageType { user, assistant }
@@ -30,10 +32,7 @@ class ChatMessageBubble extends StatelessWidget {
         showDetected: showDetected,
       );
     }
-    return _AssistantMessage(
-      message: message,
-      avatar: avatar,
-    );
+    return _AssistantMessage(message: message, avatar: avatar);
   }
 }
 
@@ -75,7 +74,7 @@ class _UserMessage extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Text(
+              child: SelectableText(
                 message,
                 style: const TextStyle(
                   color: Colors.white,
@@ -97,10 +96,7 @@ class _UserMessage extends StatelessWidget {
         if (timestamp != null) ...[
           Text(
             timestamp!,
-            style: const TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 12,
-            ),
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
           ),
           const SizedBox(width: 8),
         ],
@@ -124,14 +120,26 @@ class _UserMessage extends StatelessWidget {
   }
 }
 
-class _AssistantMessage extends StatelessWidget {
-  const _AssistantMessage({
-    required this.message,
-    this.avatar,
-  });
+class _AssistantMessage extends StatefulWidget {
+  const _AssistantMessage({required this.message, this.avatar});
 
   final String message;
   final Widget? avatar;
+
+  @override
+  State<_AssistantMessage> createState() => _AssistantMessageState();
+}
+
+class _AssistantMessageState extends State<_AssistantMessage> {
+  bool _copied = false;
+
+  void _copyMessage() {
+    Clipboard.setData(ClipboardData(text: widget.message));
+    setState(() => _copied = true);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _copied = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +150,7 @@ class _AssistantMessage extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            avatar ??
+            widget.avatar ??
                 Container(
                   width: 36,
                   height: 36,
@@ -161,18 +169,57 @@ class _AssistantMessage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'ASSISTANT',
-                    style: TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'ASSISTANT',
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: _copyMessage,
+                        borderRadius: BorderRadius.circular(4),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _copied ? Icons.check : Icons.content_copy,
+                                size: 12,
+                                color: _copied
+                                    ? AppColors.accentPurple
+                                    : AppColors.textMuted,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _copied ? 'COPIED' : 'COPY',
+                                style: TextStyle(
+                                  color: _copied
+                                      ? AppColors.accentPurple
+                                      : AppColors.textMuted,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 6),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.assistantBubble,
                       borderRadius: BorderRadius.circular(16),
@@ -181,14 +228,7 @@ class _AssistantMessage extends StatelessWidget {
                         width: 1,
                       ),
                     ),
-                    child: Text(
-                      message,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
-                    ),
+                    child: MarkdownMessage(data: widget.message),
                   ),
                 ],
               ),

@@ -12,6 +12,7 @@ class InterviewCopilotHeader extends StatelessWidget {
     this.onSystemPressed,
     this.onAnalysePressed,
     this.onClearPressed,
+    this.onCopyAllPressed,
   });
 
   final bool isMicListening;
@@ -20,6 +21,7 @@ class InterviewCopilotHeader extends StatelessWidget {
   final VoidCallback? onSystemPressed;
   final VoidCallback? onAnalysePressed;
   final VoidCallback? onClearPressed;
+  final VoidCallback? onCopyAllPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -106,21 +108,34 @@ class InterviewCopilotHeader extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _HeaderButton(
+          icon: Icons.content_copy_rounded,
+          label: 'Copy All',
+          onPressed: onCopyAllPressed,
+        ),
+        const SizedBox(width: 6),
+        _HeaderButton(
           icon: Icons.mic_rounded,
+          label: 'Microphone',
           isActive: isMicListening,
           onPressed: onMicPressed,
         ),
         const SizedBox(width: 6),
         _HeaderButton(
           icon: Icons.volume_up_rounded,
+          label: 'System Audio',
           isActive: isSystemListening,
           onPressed: onSystemPressed,
         ),
         const SizedBox(width: 6),
-        _HeaderButton(icon: Icons.monitor_rounded, onPressed: onAnalysePressed),
+        _HeaderButton(
+          icon: Icons.monitor_rounded,
+          label: 'Analyse',
+          onPressed: onAnalysePressed,
+        ),
         const SizedBox(width: 6),
         _HeaderButton(
           icon: Icons.delete_outline_rounded,
+          label: 'Clear',
           onPressed: onClearPressed,
         ),
       ],

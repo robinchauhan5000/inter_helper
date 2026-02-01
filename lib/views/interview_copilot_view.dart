@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/interview_response.dart';
 import '../services/interview_service.dart';
@@ -88,6 +89,33 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
     }
   }
 
+  void _copyAllMessages() {
+    final buffer = StringBuffer();
+    buffer.writeln('=== INTERVIEW COPILOT CHAT TRANSCRIPT ===\n');
+
+    for (final message in _messages) {
+      if (message is UserChatMessage) {
+        buffer.writeln('USER:');
+        buffer.writeln(message.text);
+        buffer.writeln();
+      } else if (message is AssistantChatMessage) {
+        buffer.writeln('ASSISTANT:');
+        buffer.writeln(message.text);
+        buffer.writeln();
+      }
+    }
+
+    Clipboard.setData(ClipboardData(text: buffer.toString()));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('All messages copied to clipboard'),
+        duration: Duration(seconds: 2),
+        backgroundColor: AppColors.accentPurple,
+      ),
+    );
+  }
+
   ChatMessage _buildResponseMessage(InterviewResponse response) {
     final buffer = StringBuffer();
 
@@ -100,14 +128,15 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
         case SectionType.details:
           final details = section.content as List;
           for (final detail in details) {
-            buffer.writeln('• $detail');
+            buffer.writeln('- $detail');
           }
           buffer.writeln();
           break;
         case SectionType.code:
-          buffer.writeln('\n```${section.language ?? ''}');
+          buffer.writeln('```${section.language ?? ''}');
           buffer.writeln(section.content);
-          buffer.writeln('```\n');
+          buffer.writeln('```');
+          buffer.writeln();
           break;
       }
     }
@@ -143,6 +172,7 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
                   _messages.clear();
                 });
               },
+              onCopyAllPressed: _copyAllMessages,
             ),
             _buildProviderSelector(),
             InterviewCopilotChatArea(
