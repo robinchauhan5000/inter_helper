@@ -270,16 +270,7 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
     return Theme(
       data: AppTheme.dark,
       child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.backgroundPrimary,
-              AppColors.backgroundPrimary.withValues(alpha: 0.95),
-            ],
-          ),
-        ),
+        decoration: const BoxDecoration(color: Colors.transparent),
         child: Column(
           children: [
             InterviewCopilotHeader(
@@ -360,7 +351,9 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
   Widget _buildProviderChip(AIProvider provider, String label) {
     final isSelected = _currentProvider == provider;
     return Material(
-      color: isSelected ? AppColors.accentPurple : AppColors.backgroundTertiary,
+      color: isSelected
+          ? AppColors.accentPurple
+          : AppColors.backgroundTertiary.withOpacity(0.4),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: () => _switchProvider(provider),

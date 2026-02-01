@@ -8,6 +8,25 @@ class MainFlutterWindow: NSWindow {
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)
 
+    // Make window always stay on top
+    self.level = .floating
+    self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+    
+    // Add glass/frosted background effect
+    self.isOpaque = false
+    self.backgroundColor = .clear
+    self.titlebarAppearsTransparent = true
+    self.styleMask.insert(.fullSizeContentView)
+    
+    // Add visual effect view (frosted glass)
+    let visualEffectView = NSVisualEffectView(frame: self.contentView!.bounds)
+    visualEffectView.autoresizingMask = [.width, .height]
+    visualEffectView.material = .hudWindow
+    visualEffectView.state = .active
+    visualEffectView.blendingMode = .behindWindow
+    
+    self.contentView?.addSubview(visualEffectView, positioned: .below, relativeTo: nil)
+
     let channel = FlutterMethodChannel(
       name: "interx/screen_capture",
       binaryMessenger: flutterViewController.engine.binaryMessenger

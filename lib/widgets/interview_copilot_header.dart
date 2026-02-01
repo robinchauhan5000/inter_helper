@@ -23,10 +23,13 @@ class InterviewCopilotHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundSecondary,
+      decoration: BoxDecoration(
+        color: AppColors.backgroundSecondary.withOpacity(0.3),
         border: Border(
-          bottom: BorderSide(color: AppColors.backgroundTertiary, width: 1),
+          bottom: BorderSide(
+            color: AppColors.backgroundTertiary.withOpacity(0.3),
+            width: 1,
+          ),
         ),
       ),
       child: Row(
@@ -150,7 +153,7 @@ class _HeaderButton extends StatelessWidget {
     return Tooltip(
       message: label ?? '',
       child: Material(
-        color: AppColors.backgroundTertiary,
+        color: AppColors.backgroundTertiary.withOpacity(0.4),
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           onTap: onPressed,

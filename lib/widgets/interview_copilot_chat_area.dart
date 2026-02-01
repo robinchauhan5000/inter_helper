@@ -19,16 +19,7 @@ class InterviewCopilotChatArea extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.backgroundPrimary,
-              Color(0xFF1A1C24),
-            ],
-          ),
-        ),
+        decoration: const BoxDecoration(color: Colors.transparent),
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 24),
           children: [
@@ -100,10 +91,7 @@ class AssistantChatMessage extends ChatMessage {
 
   @override
   Widget build(BuildContext context) {
-    return ChatMessageBubble(
-      message: text,
-      type: ChatMessageType.assistant,
-    );
+    return ChatMessageBubble(message: text, type: ChatMessageType.assistant);
   }
 }
 
@@ -157,7 +145,10 @@ class StrategyChatMessage extends ChatMessage {
                 ),
                 const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.assistantBubble,
                     borderRadius: BorderRadius.circular(16),

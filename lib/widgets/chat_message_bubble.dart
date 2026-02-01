@@ -64,7 +64,7 @@ class _UserMessage extends StatelessWidget {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: BoxDecoration(
-                color: AppColors.userBubble,
+                color: AppColors.userBubble.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -221,10 +221,10 @@ class _AssistantMessageState extends State<_AssistantMessage> {
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.assistantBubble,
+                      color: AppColors.assistantBubble.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: AppColors.backgroundTertiary,
+                        color: AppColors.backgroundTertiary.withOpacity(0.3),
                         width: 1,
                       ),
                     ),

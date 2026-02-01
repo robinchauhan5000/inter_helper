@@ -25,10 +25,13 @@ class InterviewCopilotInputBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundSecondary,
+      decoration: BoxDecoration(
+        color: AppColors.backgroundSecondary.withOpacity(0.3),
         border: Border(
-          top: BorderSide(color: AppColors.backgroundTertiary, width: 1),
+          top: BorderSide(
+            color: AppColors.backgroundTertiary.withOpacity(0.3),
+            width: 1,
+          ),
         ),
       ),
       child: SafeArea(
@@ -49,10 +52,10 @@ class InterviewCopilotInputBar extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.backgroundTertiary,
+                  color: AppColors.backgroundTertiary.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: AppColors.backgroundTertiary,
+                    color: AppColors.backgroundTertiary.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -161,7 +164,7 @@ class _IconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: backgroundColor ?? AppColors.backgroundTertiary,
+      color: backgroundColor ?? AppColors.backgroundTertiary.withOpacity(0.4),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onPressed,
