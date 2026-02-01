@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../models/interview_response.dart';
 import '../services/interview_service.dart';
+import '../services/speech_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/interview_copilot_chat_area.dart';
@@ -21,14 +22,65 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
   final _inputController = TextEditingController();
   final List<ChatMessage> _messages = [];
   late InterviewService _interviewService;
+  late SpeechService _speechService;
   bool _isLoading = false;
+  bool _isHeaderMicListening = false;
+  bool _isInputMicListening = false;
   AIProvider _currentProvider = AIProvider.openai;
 
   @override
   void initState() {
     super.initState();
     _initializeService();
+    _speechService = SpeechService();
+    _initializeSpeech();
     _askDemoQuestion();
+  }
+
+  Future<void> _initializeSpeech() async {
+    debugPrint('Initializing speech service...');
+    final initialized = await _speechService.initialize();
+    if (!initialized) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Microphone permission denied. Please enable in System Settings → Privacy & Security → Microphone',
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Open Settings',
+              textColor: Colors.white,
+              onPressed: () {
+                // On macOS, we can't directly open settings, but we can show instructions
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Enable Microphone Access'),
+                    content: const Text(
+                      '1. Open System Settings\n'
+                      '2. Go to Privacy & Security\n'
+                      '3. Click on Microphone\n'
+                      '4. Enable access for "hexmac"\n'
+                      '5. Restart the app',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      }
+    } else {
+      debugPrint('✅ Speech service initialized successfully');
+    }
   }
 
   void _initializeService() {
@@ -42,6 +94,7 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
   @override
   void dispose() {
     _inputController.dispose();
+    _speechService.dispose();
     super.dispose();
   }
 
@@ -116,6 +169,58 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
     );
   }
 
+  /// Toggle header microphone (sends directly to AI)
+  Future<void> _toggleHeaderMic() async {
+    if (_isLoading) return;
+
+    if (_isHeaderMicListening) {
+      // Stop listening
+      await _speechService.stopListening();
+      setState(() => _isHeaderMicListening = false);
+    } else {
+      // Start listening
+      setState(() => _isHeaderMicListening = true);
+      await _speechService.startListening(
+        onResult: (text) {
+          setState(() => _isHeaderMicListening = false);
+          if (text.isNotEmpty) {
+            _sendMessage(text);
+          }
+        },
+        onPartialResult: (text) {
+          // Show partial results in a temporary message
+          debugPrint('Partial: $text');
+        },
+      );
+    }
+  }
+
+  /// Toggle input microphone (fills text field)
+  Future<void> _toggleInputMic() async {
+    if (_isInputMicListening) {
+      // Stop listening
+      await _speechService.stopListening();
+      setState(() => _isInputMicListening = false);
+    } else {
+      // Start listening
+      setState(() => _isInputMicListening = true);
+      await _speechService.startListening(
+        onResult: (text) {
+          setState(() {
+            _isInputMicListening = false;
+            _inputController.text = text;
+          });
+        },
+        onPartialResult: (text) {
+          // Update text field with partial results
+          setState(() {
+            _inputController.text = text;
+          });
+        },
+      );
+    }
+  }
+
   ChatMessage _buildResponseMessage(InterviewResponse response) {
     final buffer = StringBuffer();
 
@@ -162,9 +267,9 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
         child: Column(
           children: [
             InterviewCopilotHeader(
-              isMicListening: true,
+              isMicListening: _isHeaderMicListening,
               isSystemListening: true,
-              onMicPressed: () {},
+              onMicPressed: _toggleHeaderMic,
               onSystemPressed: () {},
               onAnalysePressed: () {},
               onClearPressed: () {
@@ -202,7 +307,8 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
             InterviewCopilotInputBar(
               controller: _inputController,
               placeholder: 'Ask for a hint, custom response, or pivot...',
-              onMicPressed: () {},
+              isMicListening: _isInputMicListening,
+              onMicPressed: _toggleInputMic,
               onSpeakerPressed: () {},
               onSendPressed: () {
                 final text = _inputController.text;

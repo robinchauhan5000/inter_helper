@@ -12,6 +12,7 @@ class InterviewCopilotInputBar extends StatelessWidget {
     this.onSendPressed,
     this.onAttachmentPressed,
     this.placeholder = 'Ask for a hint, custom response, or pivot...',
+    this.isMicListening = false,
   });
 
   final TextEditingController? controller;
@@ -20,6 +21,7 @@ class InterviewCopilotInputBar extends StatelessWidget {
   final VoidCallback? onSendPressed;
   final VoidCallback? onAttachmentPressed;
   final String placeholder;
+  final bool isMicListening;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class InterviewCopilotInputBar extends StatelessWidget {
             _VoiceButton(
               icon: Icons.mic_rounded,
               onPressed: onMicPressed,
+              isListening: isMicListening,
             ),
             const SizedBox(width: 12),
             _VoiceButton(
@@ -48,7 +51,10 @@ class InterviewCopilotInputBar extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.backgroundTertiary,
                   borderRadius: BorderRadius.circular(24),
@@ -109,15 +115,17 @@ class _VoiceButton extends StatelessWidget {
   const _VoiceButton({
     required this.icon,
     this.onPressed,
+    this.isListening = false,
   });
 
   final IconData icon;
   final VoidCallback? onPressed;
+  final bool isListening;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.accentPurple,
+      color: isListening ? Colors.green : Colors.red,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: onPressed,
@@ -125,10 +133,24 @@ class _VoiceButton extends StatelessWidget {
         child: SizedBox(
           width: 48,
           height: 48,
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 24,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Icon(icon, color: Colors.white, size: 24),
+              if (isListening)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -137,11 +159,7 @@ class _VoiceButton extends StatelessWidget {
 }
 
 class _IconButton extends StatelessWidget {
-  const _IconButton({
-    required this.icon,
-    this.onPressed,
-    this.backgroundColor,
-  });
+  const _IconButton({required this.icon, this.onPressed, this.backgroundColor});
 
   final IconData icon;
   final VoidCallback? onPressed;
@@ -158,11 +176,7 @@ class _IconButton extends StatelessWidget {
         child: SizedBox(
           width: 44,
           height: 44,
-          child: Icon(
-            icon,
-            color: AppColors.textPrimary,
-            size: 22,
-          ),
+          child: Icon(icon, color: AppColors.textPrimary, size: 22),
         ),
       ),
     );
