@@ -6,3 +6,5 @@ export 'gemini_service.dart';
 export 'http_client.dart';
 export 'interview_service.dart';
 export 'openai_service.dart';
+export 'permission_service.dart';
+export 'speech_service.dart';

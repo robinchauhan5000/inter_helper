@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../models/interview_response.dart';
 import '../services/interview_service.dart';
+import '../services/permission_service.dart';
 import '../services/speech_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
@@ -33,8 +34,30 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
     super.initState();
     _initializeService();
     _speechService = SpeechService();
-    _initializeSpeech();
+    _checkPermissionsAndInitializeSpeech();
     _askDemoQuestion();
+  }
+
+  Future<void> _checkPermissionsAndInitializeSpeech() async {
+    debugPrint('Checking permissions before initializing speech...');
+
+    // Check if permissions are already granted
+    final hasPermissions = await PermissionService.hasAllPermissions();
+
+    if (!hasPermissions) {
+      debugPrint('Permissions not granted, requesting...');
+      final permissions = await PermissionService.requestAllPermissions();
+
+      if (permissions['allGranted'] != true) {
+        if (mounted) {
+          _showPermissionDeniedDialog();
+        }
+        return;
+      }
+    }
+
+    // Permissions granted, initialize speech service
+    await _initializeSpeech();
   }
 
   Future<void> _initializeSpeech() async {
@@ -42,45 +65,38 @@ class _InterviewCopilotViewState extends State<InterviewCopilotView> {
     final initialized = await _speechService.initialize();
     if (!initialized) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Microphone permission denied. Please enable in System Settings → Privacy & Security → Microphone',
-            ),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'Open Settings',
-              textColor: Colors.white,
-              onPressed: () {
-                // On macOS, we can't directly open settings, but we can show instructions
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Enable Microphone Access'),
-                    content: const Text(
-                      '1. Open System Settings\n'
-                      '2. Go to Privacy & Security\n'
-                      '3. Click on Microphone\n'
-                      '4. Enable access for "hexmac"\n'
-                      '5. Restart the app',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        );
+        _showPermissionDeniedDialog();
       }
     } else {
       debugPrint('✅ Speech service initialized successfully');
     }
+  }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Permissions Required'),
+        content: const Text(
+          'This app requires microphone and speech recognition permissions to function.\n\n'
+          'To enable:\n'
+          '1. Open System Settings\n'
+          '2. Go to Privacy & Security\n'
+          '3. Enable Microphone access for "hexmac"\n'
+          '4. Enable Speech Recognition for "hexmac"\n'
+          '5. Restart the app',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _initializeService() {

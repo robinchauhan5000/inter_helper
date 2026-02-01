@@ -2,10 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'services/permission_service.dart';
 import 'theme/app_theme.dart';
 import 'views/interview_copilot_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Request permissions on macOS before starting the app
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.macOS) {
+    debugPrint('=== Requesting macOS Permissions ===');
+    final permissions = await PermissionService.requestAllPermissions();
+    debugPrint('Microphone: ${permissions['microphone']}');
+    debugPrint('Speech Recognition: ${permissions['speechRecognition']}');
+    debugPrint('All Granted: ${permissions['allGranted']}');
+  }
+
   runApp(const MyApp());
 }
 
@@ -71,9 +83,7 @@ class _ContentViewState extends State<ContentView> {
             },
             child: Text(
               isHiding ? 'Show' : 'Hide for Share',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
         ],
@@ -86,9 +96,7 @@ class _ContentViewState extends State<ContentView> {
   }
 
   Widget _hiddenView() {
-    return const InterviewCopilotView(
-      key: ValueKey('hidden'),
-    );
+    return const InterviewCopilotView(key: ValueKey('hidden'));
   }
 
   Widget _contentView() {
